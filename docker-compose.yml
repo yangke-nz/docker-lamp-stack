@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  web-server:
+    build:
+      dockerfile: php.Dockerfile
+      context: .
+    restart: always
+    volumes:
+      - "./www/:/var/www/html/"
+      - "./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
+    ports:
+      - "8080:80"
+  mysql-server:
+    image: mysql:5.7.34
+    command: mysqld --sql_mode=""
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_TCP_PORT: 3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1.0
+    restart: always
+    environment:
+      PMA_HOST: mysql-server
+      PMA_USER: root
+      PMA_PASSWORD: secret
+      UPLOAD_LIMIT: 5000M
+      MEMORY_LIMIT: 5000M
+      MAX_EXECUTION_TIME: 6000
+    ports:
+      - "5000:80"
+volumes:
+  mysql-data:
